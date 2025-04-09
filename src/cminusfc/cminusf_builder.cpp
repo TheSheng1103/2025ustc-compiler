@@ -70,8 +70,6 @@ Value *CminusfBuilder::visit(ASTProgram &node)
 
 Value *CminusfBuilder::visit(ASTNum &node)
 {
-    // TODO: This function is empty now.
-    // Add some code here.
     if (node.type == TYPE_INT)
         tmp_val = CONST_INT(node.i_val);
     else
@@ -114,7 +112,6 @@ Value *CminusfBuilder::visit(ASTFunDeclaration &node)
 
     for (auto &param : node.params)
     {
-        // TODO: Please accomplish param_types.
         if (param->type == TYPE_INT)
         {
             if (param->isarray)
@@ -142,7 +139,6 @@ Value *CminusfBuilder::visit(ASTFunDeclaration &node)
     fun_type = FunctionType::get(ret_type, param_types);
     auto func = Function::create(fun_type, node.id, module.get());
     scope.push(node.id, func);
-    // context.func = func;
     cur_fun = func;
     auto funBB = BasicBlock::create(module.get(), "entry", func);
     builder->set_insert_point(funBB);
@@ -154,7 +150,6 @@ Value *CminusfBuilder::visit(ASTFunDeclaration &node)
     }
     for (int i = 0; i < node.params.size(); ++i)
     {
-        // TODO: You need to deal with params and store them in the scope.
         if (node.params[i]->isarray)
         {
             Value *array_alloc;
@@ -192,8 +187,6 @@ Value *CminusfBuilder::visit(ASTFunDeclaration &node)
 
 Value *CminusfBuilder::visit(ASTParam &node)
 {
-    // TODO: This function is empty now.
-    // Add some code here.
     return nullptr;
 }
 
@@ -221,8 +214,6 @@ Value* CminusfBuilder::visit(ASTCompoundStmt &node)
 
 Value *CminusfBuilder::visit(ASTExpressionStmt &node)
 {
-    // TODO: This function is empty now.
-    // Add some code here.
     if (node.expression != nullptr)
         node.expression->accept(*this);
     return nullptr;
@@ -230,13 +221,10 @@ Value *CminusfBuilder::visit(ASTExpressionStmt &node)
 
 Value *CminusfBuilder::visit(ASTSelectionStmt &node)
 {
-    // TODO: This function is empty now.
-    // Add some code here.
     node.expression->accept(*this);
     auto ret_val = tmp_val;
     auto trueBB = BasicBlock::create(module.get(), "", cur_fun);
     BasicBlock *falseBB;
-    // auto falseBB = BasicBlock::create(module.get(), "", cur_fun);
     auto contBB = BasicBlock::create(module.get(), "", cur_fun);
     Value *cond_val;
     if (ret_val->get_type()->is_integer_type())
@@ -255,20 +243,16 @@ Value *CminusfBuilder::visit(ASTSelectionStmt &node)
     }
     builder->set_insert_point(trueBB);
     node.if_statement->accept(*this);
-
-    // if (builder->get_insert_block()->get_terminator() == nullptr)
     if (not builder->get_insert_block()->is_terminated())
         builder->create_br(contBB);
 
     if (node.else_statement == nullptr)
     {
-        // falseBB->erase_from_parent();
     }
     else
     {
         builder->set_insert_point(falseBB);
         node.else_statement->accept(*this);
-        // if (builder->get_insert_block()->get_terminator() == nullptr)
         if (not builder->get_insert_block()->is_terminated())
             builder->create_br(contBB);
     }
@@ -285,7 +269,6 @@ Value* CminusfBuilder::visit(ASTIterationStmt &node)
 
     builder->create_br(cond_bb);
 
-    // Condition block
     builder->set_insert_point(cond_bb);
     node.expression->accept(*this);
     Value* cond = tmp_val;
@@ -296,14 +279,12 @@ Value* CminusfBuilder::visit(ASTIterationStmt &node)
     }
     builder->create_cond_br(cond, body_bb, exit_bb);
 
-    // Loop body
     builder->set_insert_point(body_bb);
     node.statement->accept(*this);
     if (!builder->get_insert_block()->is_terminated()) {
         builder->create_br(cond_bb);
     }
 
-    // Exit block
     builder->set_insert_point(exit_bb);
     return nullptr;
 }
@@ -317,8 +298,6 @@ Value *CminusfBuilder::visit(ASTReturnStmt &node)
     }
     else
     {
-        // TODO: The given code is incomplete.
-        // You need to solve other return cases (e.g. return an integer).
         auto fun_ret_type = cur_fun->get_function_type()->get_return_type();
         node.expression->accept(*this);
         if (fun_ret_type != tmp_val->get_type())
@@ -335,8 +314,6 @@ Value *CminusfBuilder::visit(ASTReturnStmt &node)
 
 Value *CminusfBuilder::visit(ASTVar &node)
 {
-    // TODO: This function is empty now.
-    // Add some code here.
     auto var = scope.find(node.id);
     assert(var != nullptr);
     auto is_int = var->get_type()->get_pointer_element_type()->is_integer_type();
@@ -412,8 +389,6 @@ Value *CminusfBuilder::visit(ASTVar &node)
 
 Value *CminusfBuilder::visit(ASTAssignExpression &node)
 {
-    // TODO: This function is empty now.
-    // Add some code here.
     node.expression->accept(*this);
     auto expr_result = tmp_val;
     require_lvalue = true;
@@ -492,8 +467,6 @@ Value *CminusfBuilder::visit(ASTSimpleExpression &node)
 
 Value *CminusfBuilder::visit(ASTAdditiveExpression &node)
 {
-    // TODO: This function is empty now.
-    // Add some code here.
     if (node.additive_expression == nullptr)
     {
         node.term->accept(*this);
@@ -526,8 +499,6 @@ Value *CminusfBuilder::visit(ASTAdditiveExpression &node)
 
 Value *CminusfBuilder::visit(ASTTerm &node)
 {
-    // TODO: This function is empty now.
-    // Add some code here.
     if (node.term == nullptr)
     {
         node.factor->accept(*this);
@@ -560,8 +531,6 @@ Value *CminusfBuilder::visit(ASTTerm &node)
 
 Value *CminusfBuilder::visit(ASTCall &node)
 {
-    // TODO: This function is empty now.
-    // Add some code here.
     auto fun = static_cast<Function *>(scope.find(node.id));
     std::vector<Value *> args;
     auto param_type = fun->get_function_type()->param_begin();
