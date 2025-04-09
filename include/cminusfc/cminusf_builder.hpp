@@ -104,13 +104,4 @@ class CminusfBuilder : public ASTVisitor {
     std::unique_ptr<IRBuilder> builder;
     Scope scope;
     std::unique_ptr<Module> module;
-
-    struct {
-        // whether require lvalue
-        bool require_lvalue = false;
-        // function that is being built
-        Function *func = nullptr;
-        // detect scope pre-enter (for elegance only)
-        bool pre_enter_scope = false;
-    } context;
 };
