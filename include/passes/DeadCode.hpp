@@ -24,7 +24,5 @@ class DeadCode : public Pass {
     void mark(Function *func);
     void mark(Instruction *ins);
     bool sweep(Function *func);
-    bool clear_basic_blocks(Function *func);
     bool is_critical(Instruction *ins);
-    void sweep_globally();
 };
