@@ -38,8 +38,22 @@ bool DeadCode::clear_basic_blocks(Function *func) {
 void DeadCode::mark(Function *func) {
     work_list.clear();
     marked.clear();
-    // TODO: 标记无用变量
-    throw std::runtime_error("Lab2: 你有一个TODO需要完成！");
+
+    for (auto &bb : func->get_basic_blocks()) {
+        for (auto &ins : bb.get_instructions()) {
+            if (is_critical(&ins)) {
+                marked[&ins] = true;
+                work_list.push_back(&ins);
+            }
+        }
+    }
+
+    while (work_list.empty() == false) {
+        auto now = work_list.front();
+        work_list.pop_front();
+
+        mark(now);
+    }
 }
 
 void DeadCode::mark(Instruction *ins) {
